@@ -29,6 +29,7 @@ import coil3.compose.AsyncImage
 import com.example.mynewsaggregator.data.model.NewsArticle
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScrollableTabRow
@@ -41,6 +42,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import com.example.mynewsaggregator.utils.formatDate
 import com.example.mynewsaggregator.utils.openUrl
@@ -81,8 +83,7 @@ fun NewsListScreen(
 
     Scaffold(
         modifier = Modifier
-            .fillMaxSize()
-            .statusBarsPadding(),
+            .fillMaxSize(),
         topBar = {
             TopAppBar(
                 title = { Text("Новости") },
@@ -225,7 +226,8 @@ fun NewsCard(
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp),
+                    .height(200.dp)
+                    .clip(RoundedCornerShape(12.dp)),
                 contentScale = ContentScale.Crop
             )
 
