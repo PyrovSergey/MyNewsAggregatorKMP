@@ -1,6 +1,6 @@
 package com.example.mynewsaggregator.presentation.screens.news_list
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,8 +42,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.layout.ContentScale
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mynewsaggregator.utils.formatDate
+import com.example.mynewsaggregator.utils.openUrl
 
 private val newsCategories = listOf(
     "Все" to null,
@@ -214,7 +214,10 @@ fun NewsCard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .clickable { onClick() }
+            .combinedClickable(
+                onClick = { onClick() },
+                onLongClick = { openUrl(article.url) }
+            )
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             AsyncImage(

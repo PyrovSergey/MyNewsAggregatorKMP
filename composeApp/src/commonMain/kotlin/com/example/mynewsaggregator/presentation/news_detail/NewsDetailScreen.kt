@@ -35,6 +35,7 @@ import coil3.compose.AsyncImage
 import com.example.mynewsaggregator.presentation.news_detail.NewsDetailUiState
 import com.example.mynewsaggregator.presentation.news_detail.NewsDetailViewModel
 import com.example.mynewsaggregator.utils.formatDate
+import com.example.mynewsaggregator.utils.openUrl
 import org.koin.compose.viewmodel.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -161,7 +162,7 @@ fun NewsDetailScreen(
                         }
 
                         Button(
-                            onClick = { /* TODO: Открыть URL в браузере */ },
+                            onClick = { openUrl(state.article.url) },
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Text("Читать полностью на сайте")
