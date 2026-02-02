@@ -12,7 +12,7 @@ class NewsApiService(private val client: HttpClient) {
     private val apiToken = "0focnluN9XMfRu2K36WVs4LylR8YntlGlBNJbmHV"
 
     suspend fun getAllNews(
-        language: String = "ru",
+        language: String = "en",
         categories: String? = null,
         page: Int = 1,
         limit: Int = 30
