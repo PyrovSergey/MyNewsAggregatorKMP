@@ -18,7 +18,7 @@ class NewsDetailViewModel(
         viewModelScope.launch {
             _uiState.value = NewsDetailUiState.Loading
 
-            val article = repository.getArticlesByUuid(uuid)
+            val article = repository.getArticleByUuid(uuid)
 
             if (article != null) {
                 _uiState.value = NewsDetailUiState.Success(article)

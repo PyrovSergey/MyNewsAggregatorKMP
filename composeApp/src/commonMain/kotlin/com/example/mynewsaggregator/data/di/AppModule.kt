@@ -10,8 +10,8 @@ import org.koin.dsl.module
 val appModule = module {
 
     // Network
-    factory { provideHttpClient() }
-    factory { NewsApiService(get()) }
+    single { provideHttpClient() }
+    single { NewsApiService(get()) }
 
     // Repository
     single { NewsRepository(get()) }

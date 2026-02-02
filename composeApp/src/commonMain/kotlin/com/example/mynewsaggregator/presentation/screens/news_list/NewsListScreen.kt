@@ -110,7 +110,7 @@ fun NewsListScreen(
                             selectedTab = index
                             viewModel.loadNews(
                                 category = newsCategories[index].second,
-                                isRefreshing = true
+                                isRefreshing = false
                             )
                         },
                         text = { Text(title)}
@@ -119,7 +119,7 @@ fun NewsListScreen(
             }
 
             PullToRefreshBox(
-                isRefreshing = uiState is NewsUiState.Loading,
+                isRefreshing = false,
                 onRefresh = {
                     viewModel.loadNews(
                         category = newsCategories[selectedTab].second,

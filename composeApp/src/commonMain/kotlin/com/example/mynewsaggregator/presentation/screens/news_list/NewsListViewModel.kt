@@ -18,11 +18,11 @@ class NewsListViewModel(
     private val _uiState = MutableStateFlow<NewsUiState>(NewsUiState.Loading)
     val uiState = _uiState.asStateFlow()
 
-    private var currentPage = 1
+    private val categoryCache = mutableMapOf<String?, CategoryData>()
+    private var currentCategory: String? = null
 
     var isLoadingMore by mutableStateOf(false)
         private set
-    private var hasMorePages = true
 
     init {
         loadNews()
@@ -30,20 +30,31 @@ class NewsListViewModel(
 
     fun loadNews(category: String? = null, isRefreshing: Boolean = false) {
         viewModelScope.launch {
+            if (!isRefreshing && categoryCache.containsKey(category)) {
+                val cached = categoryCache[category]!!
+                _uiState.value = NewsUiState.Success(cached.articles)
+                currentCategory = category
+                return@launch
+            }
 
+            currentCategory = category
             if (isRefreshing) {
-                currentPage = 1
-                hasMorePages = true
+                categoryCache.remove(category)
             }
 
             _uiState.value = NewsUiState.Loading
 
             repository.getNews(
                 category = category,
-                page = currentPage,
-                clearCache = isRefreshing
+                page = 1,
+                clearCache = true
             ).fold(
                 onSuccess = { articles ->
+                    categoryCache[category] = CategoryData(
+                        articles = articles,
+                        currentPage = 1,
+                        hasMorePages = true
+                    )
                     _uiState.value = NewsUiState.Success(articles)
                 },
                 onFailure = { error ->
@@ -54,32 +65,47 @@ class NewsListViewModel(
     }
 
     fun loadMoreNews(category: String? = null) {
-        if (isLoadingMore || !hasMorePages) return
+        if (isLoadingMore) return
+
+        val categoryData = categoryCache[category] ?: return
+        if (!categoryData.hasMorePages) return
 
         viewModelScope.launch {
             isLoadingMore = true
-            currentPage++
+            val nextPage = categoryData.currentPage + 1
 
             repository.getNews(
                 category = category,
-                page = currentPage
+                page = nextPage,
+                clearCache = false
             ).fold(
-                onSuccess = { articles ->
-                    if (articles.isEmpty()) {
-                        hasMorePages = false
-                        currentPage--
+                onSuccess = { newArticles ->
+                    if (newArticles.isEmpty()) {
+                        categoryCache[category] = categoryData.copy(hasMorePages = false)
+                    } else {
+                        val updatedArticles = categoryData.articles + newArticles
+                        categoryCache[category] = CategoryData(
+                            articles = updatedArticles,
+                            currentPage = nextPage,
+                            hasMorePages = true
+                        )
+                        _uiState.value = NewsUiState.Success(updatedArticles)
                     }
-                    _uiState.value = NewsUiState.Success(articles)
                     isLoadingMore = false
                 },
                 onFailure = { error ->
-                    currentPage--
                     isLoadingMore = false
                 }
             )
         }
     }
 }
+
+private data class CategoryData(
+    val articles: List<NewsArticle>,
+    val currentPage: Int,
+    val hasMorePages: Boolean
+)
 
 sealed class NewsUiState {
     object Loading : NewsUiState()

@@ -171,7 +171,7 @@ fun NewsDetailScreen(
                     }
                 }
             }
-            
+
             is NewsDetailUiState.Error -> {
                 Box(
                     modifier = Modifier

@@ -4,7 +4,7 @@ import com.example.mynewsaggregator.data.model.NewsArticle
 
 class NewsRepository(private val apiService: NewsApiService) {
 
-    private val cachedArticles = mutableListOf<NewsArticle>()
+    private val categoryCaches = mutableMapOf<String?, MutableList<NewsArticle>>()
 
     suspend fun getNews(
         language: String = "ru",
@@ -13,8 +13,10 @@ class NewsRepository(private val apiService: NewsApiService) {
         clearCache: Boolean = false
     ): Result<List<NewsArticle>> {
 
+        val cache = categoryCaches.getOrPut(category) { mutableListOf() }
+
         if (clearCache) {
-            cachedArticles.clear()
+            cache.clear()
         }
 
         return apiService.getAllNews(
@@ -22,15 +24,18 @@ class NewsRepository(private val apiService: NewsApiService) {
             categories = category,
             page = page
         ).map { response ->
-            if (page == 1) {
-                cachedArticles.clear()
+            if (page == 1 && !clearCache) {
+                cache.clear()
             }
-            cachedArticles.addAll(response.data)
-            cachedArticles.toList()
+
+            cache.addAll(response.data)
+            cache.toList()
         }
     }
 
-    fun getArticlesByUuid(uuid: String): NewsArticle? {
-        return cachedArticles.find { it.uuid == uuid }
+    fun getArticleByUuid(uuid: String): NewsArticle? {
+        return categoryCaches.values
+            .flatten()
+            .find { it.uuid == uuid }
     }
 }

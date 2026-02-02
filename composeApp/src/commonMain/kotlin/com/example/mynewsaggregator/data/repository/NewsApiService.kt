@@ -9,7 +9,8 @@ import io.ktor.client.request.parameter
 class NewsApiService(private val client: HttpClient) {
 
     private val baseUrl = "https://api.thenewsapi.com/v1"
-    private val apiToken = "0focnluN9XMfRu2K36WVs4LylR8YntlGlBNJbmHV"
+//    private val apiToken = "0focnluN9XMfRu2K36WVs4LylR8YntlGlBNJbmHV"
+    private val apiToken = "qoLInO0hteWh5IoQbopdHaKRkZNajhM5RfcgK61m"
 
     suspend fun getAllNews(
         language: String = "en",
