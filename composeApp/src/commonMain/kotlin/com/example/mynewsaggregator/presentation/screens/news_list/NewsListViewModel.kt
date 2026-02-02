@@ -69,27 +69,24 @@ class NewsListViewModel(
 
         val categoryData = categoryCache[category] ?: return
         if (!categoryData.hasMorePages) return
-
         viewModelScope.launch {
             isLoadingMore = true
             val nextPage = categoryData.currentPage + 1
-
             repository.getNews(
                 category = category,
                 page = nextPage,
                 clearCache = false
             ).fold(
                 onSuccess = { newArticles ->
-                    if (newArticles.isEmpty()) {
+                    if (newArticles.size <= categoryData.articles.size) {
                         categoryCache[category] = categoryData.copy(hasMorePages = false)
                     } else {
-                        val updatedArticles = categoryData.articles + newArticles
                         categoryCache[category] = CategoryData(
-                            articles = updatedArticles,
+                            articles = newArticles,
                             currentPage = nextPage,
                             hasMorePages = true
                         )
-                        _uiState.value = NewsUiState.Success(updatedArticles)
+                        _uiState.value = NewsUiState.Success(newArticles)
                     }
                     isLoadingMore = false
                 },
